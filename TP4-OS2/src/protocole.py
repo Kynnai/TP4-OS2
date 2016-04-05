@@ -6,7 +6,14 @@ import sys
 
 
 class Protocole:
+    """
+    Classe représentant le langage de communication avec le serveur.
+    """
 
+    def __init__(self):
+        pass
+
+    """
     s = socket.socket()
     host = '159.203.9.85'
 
@@ -81,3 +88,4 @@ class Protocole:
                 print('Serveur: ' + reponse.strip())
 
             s.close
+            """
