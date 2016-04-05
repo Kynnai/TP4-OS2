@@ -5,4 +5,9 @@
 
 
 class InterfaceUtilisateur:
-    pass
+
+    def __init__(self):
+        pass
+
+    def retourMessageServeur(self, texte):
+        print(texte)

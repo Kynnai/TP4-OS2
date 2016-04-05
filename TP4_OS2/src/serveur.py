@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-#import
+from TP4_OS2.src.interfaceUtilisateur import InterfaceUtilisateur
 
 
 class Serveur:
@@ -16,7 +16,7 @@ class Serveur:
 		pass
 
 	def receive(self, texte):
-		pass
+		return texte
 
 	def close(self):
 		pass

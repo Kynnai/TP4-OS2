@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-#import
+from TP4_OS2.src.serveur import Serveur
 
 
 class Client:
@@ -13,7 +13,7 @@ class Client:
 		pass
 
 	def bonjour(self):
-		pass
+		Serveur.send(self, "Bonjour")
 
 	def nom(self):
 		pass
