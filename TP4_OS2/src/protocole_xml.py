@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-#import
+from TP4_OS2.src.protocole import Protocole
 
 class Protocole_xml(Protocole):
     """Interface du langage de communication XML"""
