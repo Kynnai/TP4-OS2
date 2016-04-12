@@ -1,27 +1,36 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from TP4_OS2.src.serveur import Serveur
+"""from TP4_OS2.src.serveur import Serveur"""
+from TP4_OS2.src.protocoleJson import ProtocoleJson
+from TP4_OS2.src.protocoleXml import ProtocoleXml
+import sys
 
 
 class Client:
-	"""
-	Classe représentant le client
-	"""
+    """Classe représentant le client"""
 
-	def __init__(self, protocole):
-		pass
+    protocole = None
 
-	def bonjour(self):
-		Serveur.send(self, "Bonjour")
+    def __init__(self, protocole):
+        self.protocole = protocole
 
-	def nom(self):
-		pass
+    def bonjour(self):
+        pass
 
-	def listeDossiers(self, dossier):
-		pass
+    def nom(self):
+        pass
 
-	def listeFichiers(self, fichier):
-		pass
+    def listeDossiers(self, dossier):
+        pass
 
-	# etc...
+    def listeFichiers(self, fichier):
+        pass
+
+
+if __name__ == '__main__':
+    if sys.argv[2].toString == 'json':
+        Client(ProtocoleJson(sys.argv[1].toString, sys.argv[3].toStrin))
+
+    elif sys.argv[2].toString == 'xml':
+        Client(ProtocoleXml(sys.argv[1].toString, sys.argv[3].toStrin))

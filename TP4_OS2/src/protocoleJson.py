@@ -3,10 +3,11 @@
 
 from TP4_OS2.src.protocole import Protocole
 
-class Protocole_json(Protocole):
+
+class ProtocoleJson(Protocole):
     """Interface du langage de communication JSON"""
+
     def __init__(self):
-        super(Protocole_json, self).__init__()
         pass
 
     def interprete(self, message_serveur):
@@ -17,5 +18,3 @@ class Protocole_json(Protocole):
 
     def genere_nom(self):
         pass
-
-    # etc...

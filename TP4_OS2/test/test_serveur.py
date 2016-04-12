@@ -11,4 +11,4 @@ class TestServeur(TestCase):
     def test_send(self):
         Serveur.send(self, 'Bonjour')
         expectMsg = "Bonjour maitre!"
-        assert Serveur.receive(self) == expectMsg
+        assert Client.receive(self, expectMsg) == expectMsg
