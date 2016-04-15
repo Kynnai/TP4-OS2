@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import json
 
 from TP4_OS2.src.protocole import Protocole
 
@@ -20,7 +21,8 @@ class ProtocoleJson(Protocole):
         return {"action":"questionNomServeur"}
 
     def genere_listeDossiers(self, dossiers):
-        return {"questionListeDossiers":dossiers}
+        r = {"questionListeDossiers":dossiers}
+        return json.dump(r)
 
     def genere_listeFichiers(self, fichiers):
         return {"questionListeFichiers": fichiers}
