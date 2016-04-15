@@ -13,7 +13,7 @@ class Client:
     serveur = None
     protocole = None
 
-    def __init__(self, protocole, port):
+    def __init__(self, protocole, port, prompt):
         self.protocole = protocole
         self.serveur = Serveur(port)
 
@@ -32,7 +32,7 @@ class Client:
 
 if __name__ == '__main__':
     if sys.argv[2].toString == 'json':
-        Client(ProtocoleJson, sys.argv[1].toString)
+        Client(ProtocoleJson, sys.argv[1].toString, sys.argv[3].toString)
 
     elif sys.argv[2].toString == 'xml':
-        Client(ProtocoleXml, sys.argv[1].toString)
+        Client(ProtocoleXml, sys.argv[1].toString, sys.argv[3].toString)
