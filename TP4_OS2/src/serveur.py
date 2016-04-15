@@ -1,24 +1,29 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from TP4_OS2.src.interfaceUtilisateur import InterfaceUtilisateur
+"""import sys"""
+import socket
 
 
 class Serveur:
-	"""
-	Cette classe fait l'interface avec le serveur
-	"""
+    """Cette classe fait l'interface avec le serveur"""
 
-	def __init__(self, host, port):
-		pass
+    s = socket.socket()
+    host = '159.203.9.85'
 
-	def send(self, texte):
-		pass
+    MAX_RECV = 1024 * 1024 * 512
 
-	def receive(self):
-		pass
+    port = None
+    prompt = None
 
-	def close(self):
-		pass
+    def __init__(self, port):
+        self.port = port
 
-	# etc...
+    def send(self, texte):
+        pass
+
+    def receive(self):
+        pass
+
+    def close(self):
+        pass
