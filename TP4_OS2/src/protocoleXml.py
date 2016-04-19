@@ -34,10 +34,33 @@ class ProtocoleXml(Protocole):
 
     def genere_creerDossier(self, dossier):
         global PREFIXE_XML
-        return PREFIXE_XML + "<creerDossier>" + dossier + "</creerDossier"
+        return PREFIXE_XML + "<creerDossier>" + dossier + "</creerDossier>"
 
     def genere_televerserFichier(self, nom, dossier, signature, contenu, date):
         global PREFIX_XML
         return PREFIX_XML + "<televerserFichier>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<signature>" + signature + "</signature>" + \
             "<contenu>" + contenu + "</contenu>" + "<date>" + date + "</date>" + "</televerserFichier>"
-    
+
+    def genere_telechargerFichier(self, nom, dossier):
+        global PREFIXE_XML
+        return PREFIXE_XML + "<telechargerFichier>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" +  "</telechargerFichier>"
+
+    def genere_supprimerFichier(self, nom, dossier):
+        global PREFIXE_XML
+        return PREFIXE_XML + "<supprimerFichier>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "</supprimerFichier>"
+
+    def genere_supprimerDossier(self, dossier):
+        global PREFIXE_XML
+        return PREFIXE_XML + "<supprimerDossier>" + dossier + "</supprimerDossier>"
+
+    def genere_questionFichierRecent(self, nom, dossier, date):
+        global PREFIXE_XML
+        return PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<date>" + date + "</date>" + "</questionFichierRecent>"
+
+    def genere_questionFichierIdentique(self, nom, dossier, signature,  date):
+        global PREFIXE_XML
+        return PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<signature>" + signature + "</signature>" "<date>" + date + "</date>" + "</questionFichierRecent>"
+
+    def genere_quitter(self):
+        global PREFIXE_XML
+        return PREFIXE_XML + "<quitter />"
