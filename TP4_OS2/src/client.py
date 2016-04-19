@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from TP4_OS2.src.serveur import Serveur
-from TP4_OS2.src.protocoleJson import ProtocoleJson
-from TP4_OS2.src.protocoleXml import ProtocoleXml
+from serveur import Serveur
+from protocoleJson import ProtocoleJson
+from protocoleXml import ProtocoleXml
 import sys
 
 
@@ -17,20 +17,28 @@ class Client:
         self.protocole = protocole
         self.serveur = Serveur(port)
         if prompt:
-            pass
+            self.nom()
         else:
             self.synchroniser()
 
     def bonjour(self):
-        envoie = self.protocole.genere_bonjour()
+        envoie = self.protocole.genere_bonjour(self)
         self.serveur.send(envoie)
-        print(self.protocole.interprete(self.serveur.receive()))
+        message_serveur = self.serveur.receive()
+        print(self.protocole.interprete(self, message_serveur))
 
     def nom(self):
-        pass
+        envoie = self.protocole.genere_nom(self)
+        self.serveur.send(envoie)
+        message_serveur = self.serveur.receive()
+        print(self.protocole.interprete(self, message_serveur))
+
 
     def listeDossiers(self, dossier):
-        pass
+        envoie = self.protocole.genere_listeDossiers(self, dossier)
+        self.serveur.send(envoie)
+        message_serveur = self.serveur.receive()
+        print(self.protocole.interprete(self, message_serveur))
 
     def listeFichiers(self, fichier):
         pass
@@ -40,11 +48,11 @@ class Client:
 
 if __name__ == '__main__':
     prompt = False
-    if  sys.argv[3].toString == "prompt":
+    if  sys.argv[3] == "prompt":
         prompt = True
 
-    if sys.argv[2].toString == "json":
-        Client(ProtocoleJson, sys.argv[1].toString, prompt)
+    if sys.argv[2] == "json":
+        Client(ProtocoleJson, int(sys.argv[1]), prompt)
 
-    elif sys.argv[2].toString == "xml":
-        Client(ProtocoleXml, sys.argv[1].toString, prompt)
+    elif sys.argv[2] == "xml":
+        Client(ProtocoleXml, int(sys.argv[1]), prompt)

@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 import json
 
-from TP4_OS2.src.protocole import Protocole
+#pour les tests
+#from TP4_OS2.src.protocole import Protocole
+
+#pour le serveur
+from protocole import Protocole
 
 
 class ProtocoleJson(Protocole):
@@ -33,10 +37,10 @@ class ProtocoleJson(Protocole):
         return retourStr
 
     def genere_bonjour(self):
-        return {"salutation":"bonjourServeur"}
+        return json.dumps({"salutation":"bonjourServeur"})
 
     def genere_nom(self):
-        return {"action":"questionNomServeur"}
+        return json.dumps({"action":"questionNomServeur"})
 
     def genere_listeDossiers(self, dossiers):
         return json.dumps({"questionListeDossiers" : dossiers})

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-from TP4_OS2.src.protocole import Protocole
+from protocole import Protocole
 
 
 class ProtocoleXml(Protocole):
