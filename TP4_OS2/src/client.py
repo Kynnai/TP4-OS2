@@ -16,9 +16,15 @@ class Client:
     def __init__(self, protocole, port, prompt):
         self.protocole = protocole
         self.serveur = Serveur(port)
+        if prompt:
+            pass
+        else:
+            self.synchroniser()
 
     def bonjour(self):
-        pass
+        envoie = self.protocole.genere_bonjour()
+        self.serveur.send(envoie)
+        print(self.protocole.interprete(self.serveur.receive()))
 
     def nom(self):
         pass
@@ -29,10 +35,16 @@ class Client:
     def listeFichiers(self, fichier):
         pass
 
+    def synchroniser(self):
+        pass
 
 if __name__ == '__main__':
-    if sys.argv[2].toString == 'json':
-        Client(ProtocoleJson, sys.argv[1].toString, sys.argv[3].toString)
+    prompt = False
+    if  sys.argv[3].toString == "prompt":
+        prompt = True
 
-    elif sys.argv[2].toString == 'xml':
-        Client(ProtocoleXml, sys.argv[1].toString, sys.argv[3].toString)
+    if sys.argv[2].toString == "json":
+        Client(ProtocoleJson, sys.argv[1].toString, prompt)
+
+    elif sys.argv[2].toString == "xml":
+        Client(ProtocoleXml, sys.argv[1].toString, prompt)

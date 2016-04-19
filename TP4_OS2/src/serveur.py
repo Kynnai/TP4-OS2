@@ -17,13 +17,13 @@ class Serveur:
     prompt = None
 
     def __init__(self, port):
-        self.port = port
+        self.s.connect((self.host, port))
 
     def send(self, texte):
-        pass
+        self.s.send(texte)
 
     def receive(self):
-        pass
+        return self.s.receive(self.MAX_RECV)
 
     def close(self):
-        pass
+        self.s._close()
