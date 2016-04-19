@@ -12,7 +12,25 @@ class ProtocoleJson(Protocole):
         pass
 
     def interprete(self, message_serveur):
-        pass
+        interpreteur = json.loads(message_serveur)
+        if("salutation" in interpreteur and interpreteur["salutation"] == "bonjourClient"):
+            return "oui"
+        elif("nomServeur" in interpreteur):
+            return interpreteur["nomServeur"]
+        elif ("listeDossiers" in interpreteur):
+            return self.obtenirElements(interpreteur["listeDossiers"]["dossier"])
+        elif ("reponse" in interpreteur):
+            return interpreteur["reponse"]
+        elif ("listeFichiers" in interpreteur):
+            return self.obtenirElements(interpreteur["listeFichiers"]["fichier"])
+        elif ("fichier" in interpreteur):
+            return self.obtenirElements(interpreteur["fichier"])
+
+    def obtenirElements(self, monDict):
+        retourStr = ""
+        for element in monDict:
+            retourStr += element
+        return retourStr
 
     def genere_bonjour(self):
         return {"salutation":"bonjourServeur"}
@@ -21,7 +39,6 @@ class ProtocoleJson(Protocole):
         return {"action":"questionNomServeur"}
 
     def genere_listeDossiers(self, dossiers):
-        r = {"questionListeDossiers":dossiers}
         return json.dumps({"questionListeDossiers" : dossiers})
 
     def genere_listeFichiers(self, fichiers):
