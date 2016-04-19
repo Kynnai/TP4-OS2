@@ -31,7 +31,25 @@ class ProtocoleJson(Protocole):
         return json.dumps({"creerDossier":dossier})
 
     def genere_televerserFichier(self, nom, dossier, signature, contenu, date):
-        return json.dumps({"televerserFichier":{"nom":nom, "dossier":dossier, "signature":signature, "contenu":contenu, "date":date}})
+        return json.dumps({"televerserFichier":
+                               {"nom":nom, "dossier":dossier, "signature":signature, "contenu":contenu, "date":date}})
+
+    def genere_telechargerFichier(self, nom, dossier):
+        return json.dumps({"telechargerFichier":{"nom": nom, "dossier": dossier}})
 
     def genere_supprimerFichier(self, nom, dossier):
         return json.dumps({"supprimerFichier":{"nom":nom, "dossier":dossier}})
+
+    def genere_supprimerDossier(self, dossier):
+        return json.dumps({"supprimerDossier":dossier})
+
+    def genere_fichierRecent(self, nom, dossier, date):
+        return json.dumps({"questionFichierRecent":
+                               {"nom": nom, "dossier": dossier, "date":date}})
+
+    def genere_fichierIdentique(self, nom, dossier, signature, date):
+        return json.dumps({"questionFichierIdentique":
+                               {"nom": nom, "dossier": dossier, "signature":signature, "date": date}})
+
+    def genere_quitter(self):
+        return json.dumps({"action":"quitter"})
