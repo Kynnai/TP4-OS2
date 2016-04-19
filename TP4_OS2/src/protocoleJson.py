@@ -22,16 +22,16 @@ class ProtocoleJson(Protocole):
 
     def genere_listeDossiers(self, dossiers):
         r = {"questionListeDossiers":dossiers}
-        return json.dump(r)
+        return json.dumps({"questionListeDossiers" : dossiers})
 
     def genere_listeFichiers(self, fichiers):
-        return {"questionListeFichiers": fichiers}
+        return json.dumps({"questionListeFichiers": fichiers})
 
     def genere_creerDossier(self, dossier):
-        return {"creerDossier":dossier}
+        return json.dumps({"creerDossier":dossier})
 
     def genere_televerserFichier(self, nom, dossier, signature, contenu, date):
-        return {"televerserFichier":{"nom":nom, "dossier":dossier, "signature":signature, "contenu":contenu, "date":date}}
+        return json.dumps({"televerserFichier":{"nom":nom, "dossier":dossier, "signature":signature, "contenu":contenu, "date":date}})
 
     def genere_supprimerFichier(self, nom, dossier):
-        return {"supprimerFichier":{"nom":nom, "dossier":dossier}}
+        return json.dumps({"supprimerFichier":{"nom":nom, "dossier":dossier}})
