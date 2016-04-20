@@ -4,6 +4,7 @@
 from serveur import Serveur
 from protocoleJson import ProtocoleJson
 from protocoleXml import ProtocoleXml
+from interfaceUtilisateur import InterfaceUtilisateur
 import sys
 
 
@@ -12,89 +13,75 @@ class Client:
 
     serveur = None
     protocole = None
+    interface = None
 
     def __init__(self, protocole, port, prompt):
         self.protocole = protocole
         self.serveur = Serveur(port)
+        self.interface = InterfaceUtilisateur()
         if prompt:
-            pass
+            self.communication()
         else:
             self.synchroniser()
 
-    def bonjour(self):
-        envoie = self.protocole.genere_bonjour(self)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
+    def communication(self):
+        r = input("Commande:").split(" ")
+        while r[0] != "quitter":
+            envoie = None
+            message = "Commande invalide"
+            if r[0] == "connecter?":
+                envoie = self.protocole.genere_bonjour(self)
+            elif r[0] == "nomServeur?":
+                envoie = self.protocole.genere_nom(self)
+            elif r[0] == "listeDossier?":
+                if len(r) != 1:
+                    envoie = self.protocole.genere_listeDossiers(self, r[1])
+                else:
+                    message = "Élément manquant!"
+            elif r[0] == "dossier?":
+                if len(r) != 1:
+                    envoie = self.protocole.genere_listeFichiers(self, r[1])
+                else:
+                    message = "Élément manquant!"
+            elif r[0] == "creerDossier?":
+                if len(r) != 1:
+                    envoie = self.protocole.genere_creerDossier(self, r[1])
+                else:
+                    message = "Élément manquant!"
+            elif r[0]  == "televerser?":
+                """envoie = self.protocole.genere_televerserFichier(self)"""
+            elif r[0] == "telecharger?":
+                """envoie = self.protocole.genere_telechargerFichier(self)"""
+            elif r[0] == "supprimerDossier?":
+                """envoie = self.protocole.genere_supprimerDossier(self)"""
+            elif r[0] == "supprimerFichier?":
+                """envoie = self.protocole.genere_supprimerFichier(self)"""
+            elif r[0] == "fichier?":
+                """TODO:Demander au prof c'est quoi la commande..."""
+            elif r[0] == "identiqueFichier?":
+                """envoie = self.protocole.genere_fichierIdentique(self)"""
+            elif r[0] == "fichierRecent?":
+                """envoie = self.protocole.genere_fichierRecent(self)"""
+            elif r[0] == "miseAjour":
+                if len(r) != 1:
+                    self.miseAjour(r[1])
+                else:
+                    message = "Élément manquant!"
+            elif r[0] == "quitter":
+                envoie = self.protocole.genere_quitter(self)
 
-    def nom(self):
-        envoie = self.protocole.genere_nom(self)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-
-    def listeDossiers(self, dossier):
-        envoie = self.protocole.genere_listeDossiers(self, dossier)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def listeFichiers(self, fichier):
-        envoie = self.protocole.genere_listeFichiers(self, fichier)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def creerDossier(self, dossier):
-        envoie = self.protocole.genere_creerDossier(self, dossier)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def televerserFichier(self, nom, dossier, signature, contenu, date):
-        envoie = self.protocole.genere_televerserFichier(self, nom, dossier, signature, contenu, date)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def telechargerFichier(self, nom, dossier):
-        envoie = self.protocole.genere_telechargerFichier(self, nom, dossier)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def supprimerFichier(self, nom, dossier):
-        envoie = self.protocole.genere_supprimerFichier(self, nom, dossier)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def supprimerDossier(self, dossier):
-        envoie = self.protocole.genere_supprimerDossier(self, dossier)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def fichierRecent(self, nom, dossier, date):
-        envoie = self.protocole.genere_fichierRecent(self, nom, dossier, date)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def fichierIdentique(self, nom, dossier, signature, date):
-        envoie = self.protocole.genere_fichierIdentique(self, nom, dossier, signature, date)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
-
-    def quitter(self):
-        envoie = self.protocole.genere_quitter(self)
-        self.serveur.send(envoie)
-        message_serveur = self.serveur.receive()
-        print(self.protocole.interprete(self, message_serveur))
+            if envoie != None:
+                self.serveur.send(envoie)
+                message_serveur = self.serveur.receive()
+                self.interface.retourMessageServeur(self.protocole.interprete(self, message_serveur))
+            else:
+                self.interface.retourMessageServeur(message)
+            r = input("Commande:").split(" ")
 
     def synchroniser(self):
+        pass
+
+    def miseAjour(self, dossier):
         pass
 
 if __name__ == '__main__':

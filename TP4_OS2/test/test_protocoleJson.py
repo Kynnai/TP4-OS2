@@ -109,8 +109,6 @@ class TestProtocole_json(TestCase):
         self.assertTrue(self.protocole.genere_creerDossier(self.dossier), json.dumps({"creerDossier":self.dossier}))
 
     def test_genere_televerserFichier(self):
-
-
         self.assertTrue(self.protocole.genere_televerserFichier(self.nom, self.dossier, self.signature, self.contenu, self.date),
                         json.dumps({"televerserFichier":
                                         {"nom":self.nom, "dossier":self.dossier, "signature":self.signature, "contenu":self.contenu, "date":self.date}}))

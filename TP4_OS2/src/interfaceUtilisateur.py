@@ -10,4 +10,4 @@ class InterfaceUtilisateur:
         pass
 
     def retourMessageServeur(self, texte):
-        print(texte)
+        print("Réponse serveur : " + texte)
