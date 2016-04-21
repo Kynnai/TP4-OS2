@@ -17,6 +17,11 @@ class Client:
     serveur = None
     protocole = None
     interface = None
+    nom = None
+    dossier = None
+    signature = None
+    contenu = None
+    date = None
 
     def __init__(self, protocole, port, prompt):
         self.protocole = protocole
@@ -50,13 +55,8 @@ class Client:
                     message = "Élément manquant!"
             elif r[0]  == "televerser?":
                 if len(r) != 1:
-                    chemin = os.path.dirname(os.path.abspath(__file__))+ "\ ".strip() + r[1]
-                    nom = self.obtenirNomFichier(r[1])
-                    dossier = self.obtenirDossier(r[1])
-                    signature = self.obtenirSignature(chemin)
-                    contenu = self.obtenirContenu(chemin)
-                    date = self.obtenirDateFichier(chemin)
-                    envoie = self.protocole.genere_televerserFichier(self, nom, dossier, signature, contenu, date)
+                    self.initialiserInformation(r[1])
+                    envoie = self.protocole.genere_televerserFichier(self, self.nom, self.dossier, self.signature, self.contenu, self.date)
                 else:
                     message = "Élément manquant!"
             elif r[0] == "telecharger?":
@@ -65,9 +65,8 @@ class Client:
                 envoie = self.protocole.genere_supprimerDossier(self, r[1])
             elif r[0] == "supprimerFichier?":
                 if len(r) != 1:
-                    nom = self.obtenirNomFichier(r[1])
-                    dossier = self.obtenirDossier(r[1])
-                    envoie = self.protocole.genere_supprimerFichier(self, nom, dossier)
+                    self.initialiserInformation(r[1])
+                    envoie = self.protocole.genere_supprimerFichier(self, self.nom, self.dossier)
                 else:
                     message = "Élément manquant!"
             elif r[0] == "fichier?":
@@ -76,7 +75,11 @@ class Client:
             elif r[0] == "identiqueFichier?":
                 """envoie = self.protocole.genere_fichierIdentique(self)"""
             elif r[0] == "fichierRecent?":
-                """envoie = self.protocole.genere_fichierRecent(self)"""
+                if len(r) != 1:
+                    self.initialiserInformation(r[1])
+                    envoie = self.protocole.genere_fichierRecent(self, self.nom, self.dossier, self.date)
+                else:
+                    message = "Élément manquant!"
             elif r[0] == "miseAjour":
                 if len(r) != 1:
                     self.miseAjour(r[1])
@@ -99,6 +102,14 @@ class Client:
     def miseAjour(self, dossier):
         pass
 
+    def initialiserInformation(self, ligne):
+        chemin = os.path.dirname(os.path.abspath(__file__)) + "\ ".strip() + ligne
+        self.nom = self.obtenirNomFichier(ligne)
+        self.dossier = self.obtenirDossier(ligne)
+        self.signature = self.obtenirSignature(chemin)
+        self.contenu = self.obtenirContenu(chemin)
+        self.date = self.obtenirDateFichier(chemin)
+
     def obtenirNomFichier(self, ligne):
         dossier = ligne.split("/")
         fichier = dossier[len(dossier) - 1]
@@ -114,7 +125,6 @@ class Client:
 
     def obtenirSignature(self, fichier):
         try:
-            # Voici comment lire le contenu d'un fichier
             contenu = open(fichier).read()
         except:
             print("Impossible de lire le fichier " + fichier)
