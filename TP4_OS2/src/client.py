@@ -71,7 +71,8 @@ class Client:
                 else:
                     message = "Élément manquant!"
             elif r[0] == "fichier?":
-                """TODO:Demander au prof c'est quoi la commande..."""
+                #TODO:Trouver la bonne méthode car retourne les fichiers au lieux de répondre Oui, si on écrit ex: d1/f1.txt retourne une erreur
+                envoie = self.protocole.genere_listeFichiers(self, r[1])
             elif r[0] == "identiqueFichier?":
                 """envoie = self.protocole.genere_fichierIdentique(self)"""
             elif r[0] == "fichierRecent?":
