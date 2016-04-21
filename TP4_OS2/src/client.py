@@ -60,7 +60,11 @@ class Client:
                 else:
                     message = "Élément manquant!"
             elif r[0] == "telecharger?":
-                """envoie = self.protocole.genere_telechargerFichier(self)"""
+                if len(r) != 1:
+                    self.initialiserInformation(r[1])
+                    envoie = self.protocole.genere_telechargerFichier(self, self.nom, self.dossier)
+                else:
+                    message = "Élément manquant!"
             elif r[0] == "supprimerDossier?":
                 envoie = self.protocole.genere_supprimerDossier(self, r[1])
             elif r[0] == "supprimerFichier?":
