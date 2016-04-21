@@ -8,6 +8,7 @@ from interfaceUtilisateur import InterfaceUtilisateur
 import sys
 import hashlib
 import os
+import binascii
 
 
 class Client:
@@ -110,6 +111,19 @@ class Client:
         date_modification = str(fichier_stat.st_mtime)
         return date_modification
 
+    def obtenirContenu(self, fichier):
+        try:
+            # Voici comment lire le contenu d'un fichier
+            contenu = open(fichier).read()
+        except:
+            print("Impossible de lire le fichier " + fichier)
+            sys.exit(1)
+        contenu_utf_8 = contenu.encode(encoding='UTF-8')
+        contenu_encode = binascii.b2a_base64(contenu_utf_8)
+
+        contenu_ascii = contenu_encode.decode(encoding='ascii')
+        return contenu_ascii
+        
 if __name__ == '__main__':
     prompt = False
     if  "prompt" in sys.argv:
