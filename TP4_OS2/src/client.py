@@ -6,6 +6,7 @@ from protocoleJson import ProtocoleJson
 from protocoleXml import ProtocoleXml
 from interfaceUtilisateur import InterfaceUtilisateur
 import sys
+import hashlib
 
 
 class Client:
@@ -83,6 +84,15 @@ class Client:
 
     def obtenirElements(self, monDict):
         return self.protocole.obtenirElements(self, monDict)
+
+    def obtenirSignature(self, fichier):
+        contenu = open(fichier).read()
+        contenu_utf_8 = contenu.encode(encoding='UTF-8')
+        objet_md5 = hashlib.md5()
+        objet_md5.update(contenu_utf_8)
+        signature_contenu = objet_md5.hexdigest()
+        
+        return signature_contenu
 
 if __name__ == '__main__':
     prompt = False

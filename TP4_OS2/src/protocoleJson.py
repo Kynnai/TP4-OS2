@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import json
-
 #pour les tests
 #from TP4_OS2.src.protocole import Protocole
 
