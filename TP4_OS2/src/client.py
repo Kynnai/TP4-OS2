@@ -50,12 +50,13 @@ class Client:
                     message = "Élément manquant!"
             elif r[0]  == "televerser?":
                 if len(r) != 1:
-                    fichier = self.obtenirNomFichier(r[1])
+                    chemin = os.path.dirname(os.path.abspath(__file__))+ "\ ".strip() + r[1]
+                    nom = self.obtenirNomFichier(r[1])
                     dossier = self.obtenirDossier(r[1])
-                    signature = self.obtenirSignature(fichier)
-                    contenu = self.obtenirContenu(fichier)
-                    date = self.obtenirDateFichier(fichier)
-                    envoie = self.protocole.genere_televerserFichier(self, fichier, dossier, signature, contenu, date)
+                    signature = self.obtenirSignature(chemin)
+                    contenu = self.obtenirContenu(chemin)
+                    date = self.obtenirDateFichier(chemin)
+                    envoie = self.protocole.genere_televerserFichier(self, nom, dossier, signature, contenu, date)
                 else:
                     message = "Élément manquant!"
             elif r[0] == "telecharger?":
@@ -63,7 +64,12 @@ class Client:
             elif r[0] == "supprimerDossier?":
                 envoie = self.protocole.genere_supprimerDossier(self, r[1])
             elif r[0] == "supprimerFichier?":
-                """envoie = self.protocole.genere_supprimerFichier(self)"""
+                if len(r) != 1:
+                    nom = self.obtenirNomFichier(r[1])
+                    dossier = self.obtenirDossier(r[1])
+                    envoie = self.protocole.genere_supprimerFichier(self, nom, dossier)
+                else:
+                    message = "Élément manquant!"
             elif r[0] == "fichier?":
                 """TODO:Demander au prof c'est quoi la commande..."""
             elif r[0] == "identiqueFichier?":
