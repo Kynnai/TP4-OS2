@@ -50,7 +50,7 @@ class Client:
             elif r[0] == "telecharger?":
                 """envoie = self.protocole.genere_telechargerFichier(self)"""
             elif r[0] == "supprimerDossier?":
-                """envoie = self.protocole.genere_supprimerDossier(self)"""
+                envoie = self.protocole.genere_supprimerDossier(self, r[1])
             elif r[0] == "supprimerFichier?":
                 """envoie = self.protocole.genere_supprimerFichier(self)"""
             elif r[0] == "fichier?":
