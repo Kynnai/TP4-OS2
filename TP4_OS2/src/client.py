@@ -49,7 +49,15 @@ class Client:
                 else:
                     message = "Élément manquant!"
             elif r[0]  == "televerser?":
-                """envoie = self.protocole.genere_televerserFichier(self)"""
+                if len(r) != 1:
+                    fichier = self.obtenirNomFichier(r[1])
+                    dossier = self.obtenirDossier(r[1])
+                    signature = self.obtenirSignature(fichier)
+                    contenu = self.obtenirContenu(fichier)
+                    date = self.obtenirDateFichier(fichier)
+                    envoie = self.protocole.genere_televerserFichier(self, fichier, dossier, signature, contenu, date)
+                else:
+                    message = "Élément manquant!"
             elif r[0] == "telecharger?":
                 """envoie = self.protocole.genere_telechargerFichier(self)"""
             elif r[0] == "supprimerDossier?":
@@ -83,6 +91,16 @@ class Client:
 
     def miseAjour(self, dossier):
         pass
+
+    def obtenirNomFichier(self, ligne):
+        dossier = ligne.split("/")
+        fichier = dossier[len(dossier) - 1]
+        return fichier
+
+    def obtenirDossier(self, ligne):
+        dossier = ligne.split("/")
+        dernier = dossier[len(dossier) - 2]
+        return dernier
 
     def obtenirElements(self, monDict):
         return self.protocole.obtenirElements(self, monDict)
@@ -123,7 +141,7 @@ class Client:
 
         contenu_ascii = contenu_encode.decode(encoding='ascii')
         return contenu_ascii
-        
+
 if __name__ == '__main__':
     prompt = False
     if  "prompt" in sys.argv:
