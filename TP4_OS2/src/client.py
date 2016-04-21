@@ -7,6 +7,7 @@ from protocoleXml import ProtocoleXml
 from interfaceUtilisateur import InterfaceUtilisateur
 import sys
 import hashlib
+import os
 
 
 class Client:
@@ -86,13 +87,28 @@ class Client:
         return self.protocole.obtenirElements(self, monDict)
 
     def obtenirSignature(self, fichier):
-        contenu = open(fichier).read()
+        try:
+            # Voici comment lire le contenu d'un fichier
+            contenu = open(fichier).read()
+        except:
+            print("Impossible de lire le fichier " + fichier)
+            sys.exit(1)
         contenu_utf_8 = contenu.encode(encoding='UTF-8')
         objet_md5 = hashlib.md5()
         objet_md5.update(contenu_utf_8)
         signature_contenu = objet_md5.hexdigest()
-        
+
         return signature_contenu
+
+    def obtenirDateFichier(self, fichier):
+        try:
+            fichier_stat = os.stat(fichier)
+        except:
+            print("Impossible de lire le fichier " + fichier)
+            sys.exit(1)
+
+        date_modification = str(fichier_stat.st_mtime)
+        return date_modification
 
 if __name__ == '__main__':
     prompt = False
