@@ -72,8 +72,12 @@ class Client:
             elif r[0] == "fichier?":
                 #TODO:Trouver la bonne méthode car retourne les fichiers au lieux de répondre Oui, si on écrit ex: d1/f1.txt retourne une erreur
                 envoie = self.protocole.genere_listeFichiers(self, r[1])
-            elif r[0] == "identiqueFichier?":
-                """envoie = self.protocole.genere_fichierIdentique(self)"""
+            elif r[0] == "identiqueFichier?" or r[0] == "fichierIdentique?":
+                if len(r) != 1:
+                    self.initialiserInformation(r[1])
+                    envoie = self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date)
+                else:
+                    message = "Élément manquant!"
             elif r[0] == "fichierRecent?":
                 if len(r) != 1:
                     self.initialiserInformation(r[1])
@@ -142,7 +146,6 @@ class Client:
         except:
             print("Impossible de lire le fichier " + fichier)
             sys.exit(1)
-
         date_modification = str(fichier_stat.st_mtime)
         return date_modification
 
