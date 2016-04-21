@@ -22,7 +22,11 @@ class ProtocoleJson(Protocole):
         elif("nomServeur" in interpreteur):
             return interpreteur["nomServeur"]
         elif ("listeDossiers" in interpreteur):
-            return self.obtenirElements(interpreteur["listeDossiers"]["dossier"])
+            dossier = self.obtenirElements(interpreteur["listeDossiers"]["dossier"])
+            if dossier == "":
+                return "Oui"
+            else:
+                return dossier
         elif ("reponse" in interpreteur):
             return interpreteur["reponse"]
         elif ("listeFichiers" in interpreteur):
