@@ -34,13 +34,10 @@ class Client:
             elif r[0] == "nomServeur?":
                 envoie = self.protocole.genere_nom(self)
             elif r[0] == "listeDossier?":
-                if len(r) != 1:
-                    envoie = self.protocole.genere_listeDossiers(self, r[1])
-                else:
-                    message = "Élément manquant!"
+                    envoie = self.protocole.genere_listeDossiers(self, "./")
             elif r[0] == "dossier?":
                 if len(r) != 1:
-                    envoie = self.protocole.genere_listeFichiers(self, r[1])
+                    envoie = self.protocole.genere_listeDossiers(self, r[1])
                 else:
                     message = "Élément manquant!"
             elif r[0] == "creerDossier?":
@@ -79,14 +76,17 @@ class Client:
             r = input("Commande:").split(" ")
 
     def synchroniser(self):
-        pass
+        self.interface.retourMessageServeur("Méthode Sync non fonctionnel")
 
     def miseAjour(self, dossier):
         pass
 
+    def obtenirElements(self, monDict):
+        return self.protocole.obtenirElements(self, monDict)
+
 if __name__ == '__main__':
     prompt = False
-    if  sys.argv[3] == "prompt":
+    if  "prompt" in sys.argv:
         prompt = True
 
     if sys.argv[2] == "json":

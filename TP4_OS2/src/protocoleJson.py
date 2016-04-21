@@ -33,7 +33,7 @@ class ProtocoleJson(Protocole):
     def obtenirElements(self, monDict):
         retourStr = ""
         for element in monDict:
-            retourStr += element
+            retourStr += element + " "
         return retourStr
 
     def genere_bonjour(self):
