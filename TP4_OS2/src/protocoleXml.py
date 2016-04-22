@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+#TODO:lien pour installer la libraries https://github.com/martinblech/xmltodict
+import xmltodict
 from protocole import Protocole
 
 
 class ProtocoleXml(Protocole):
-    """Interface du langage de communication XML"""
+    """IPREFIXE_XML = "<?xml version=\"1.0\" ?>"nterface du langage de communication XML"""
 
     PREFIXE_XML = "<?xml version=\"1.0\" ?>"
 
@@ -13,8 +15,51 @@ class ProtocoleXml(Protocole):
         pass
 
     def interprete(self, message_serveur):
-        #minidom shit
-        pass
+        interpreteur = xmltodict.parse(message_serveur[22:len(message_serveur)])
+        #interpreteur = parseString(message_serveur)
+        print(interpreteur)
+        if ("bonjourClient" in interpreteur):
+            return "oui"
+        elif ("nomServeur" in interpreteur):
+            return interpreteur["nomServeur"]
+        elif ("listeDossiers" in interpreteur):
+            if interpreteur["listeDossiers"] == None:
+                return "oui"
+            else:
+                dossier = self.obtenirElements(interpreteur["listeDossiers"]["dossier"])
+                return dossier
+        elif ("ok" in interpreteur):
+            return "ok"
+        elif ("erreurDossierExiste" in interpreteur):
+            return "erreurDossierExiste"
+        elif ("erreurDossierInexistant" in interpreteur):
+            return "erreurDossierInexistant"
+        elif ("erreurDossierLecture" in interpreteur):
+            return "erreurDossierLecture"
+        elif ("erreurFichierExiste" in interpreteur):
+            return "erreurFichierExiste"
+        elif ("erreurSignature" in interpreteur):
+            return "erreurSignature"
+        elif ("erreurFichierInexistant" in interpreteur):
+            return "erreurFichierInexistant"
+        elif("erreurFichierLecture" in interpreteur):
+            return "erreurFichierLecture"
+        elif ("bye" in interpreteur):
+            return "bye"
+        elif ("listeFichiers" in interpreteur):
+            if interpreteur["listeFichiers"] == None:
+                return "oui"
+            else:
+                fichiers = self.obtenirElements(interpreteur["listeFichiers"]["fichier"])
+                return fichiers
+        elif ("fichier" in interpreteur):
+            return self.obtenirElements(interpreteur["fichier"])
+
+    def obtenirElements(self, monDict):
+        retourStr = ""
+        for element in monDict:
+            retourStr += element + " "
+        return retourStr
 
     def genere_bonjour(self):
         return self.PREFIXE_XML + "<bonjourServeur />"

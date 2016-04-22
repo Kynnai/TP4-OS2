@@ -16,6 +16,7 @@ class ProtocoleJson(Protocole):
 
     def interprete(self, message_serveur):
         interpreteur = json.loads(message_serveur)
+        print(interpreteur)
         if("salutation" in interpreteur and interpreteur["salutation"] == "bonjourClient"):
             return "oui"
         elif("nomServeur" in interpreteur):
