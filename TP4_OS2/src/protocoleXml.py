@@ -10,14 +10,12 @@ class ProtocoleXml(Protocole):
     """IPREFIXE_XML = "<?xml version=\"1.0\" ?>"nterface du langage de communication XML"""
 
     PREFIXE_XML = "<?xml version=\"1.0\" ?>"
-
-    def __init__(self):
-        pass
+    client = None
+    def __init__(self, client):
+        self.client = client
 
     def interprete(self, message_serveur):
         interpreteur = xmltodict.parse(message_serveur[22:len(message_serveur)])
-        #interpreteur = parseString(message_serveur)
-        print(interpreteur)
         if ("bonjourClient" in interpreteur):
             return "oui"
         elif ("nomServeur" in interpreteur):
@@ -42,23 +40,25 @@ class ProtocoleXml(Protocole):
             return "erreurSignature"
         elif ("erreurFichierInexistant" in interpreteur):
             return "erreurFichierInexistant"
-        elif("erreurFichierLecture" in interpreteur):
+        elif ("erreurFichierLecture" in interpreteur):
             return "erreurFichierLecture"
         elif ("bye" in interpreteur):
             return "bye"
+        elif ("oui" in interpreteur):
+            return "oui"
+        elif ("non" in interpreteur):
+            return "non"
         elif ("listeFichiers" in interpreteur):
-            if interpreteur["listeFichiers"] == None:
-                return "oui"
-            else:
-                fichiers = self.obtenirElements(interpreteur["listeFichiers"]["fichier"])
-                return fichiers
+            fichiers = self.obtenirElements(interpreteur["listeFichiers"]["fichier"])
+            return fichiers
         elif ("fichier" in interpreteur):
             return self.obtenirElements(interpreteur["fichier"])
 
     def obtenirElements(self, monDict):
         retourStr = ""
-        for element in monDict:
-            retourStr += element + " "
+        for i in range(0, len(monDict)):
+            retourStr += monDict[i] + " "
+
         return retourStr
 
     def genere_bonjour(self):
@@ -89,10 +89,10 @@ class ProtocoleXml(Protocole):
     def genere_supprimerDossier(self, dossier):
         return self.PREFIXE_XML + "<supprimerDossier>" + dossier + "</supprimerDossier>"
 
-    def genere_questionFichierRecent(self, nom, dossier, date):
+    def genere_fichierRecent(self, nom, dossier, date):
         return self.PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<date>" + date + "</date>" + "</questionFichierRecent>"
 
-    def genere_questionFichierIdentique(self, nom, dossier, signature,  date):
+    def genere_fichierIdentique(self, nom, dossier, signature,  date):
         return self.PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<signature>" + signature + "</signature>" "<date>" + date + "</date>" + "</questionFichierRecent>"
 
     def genere_quitter(self):

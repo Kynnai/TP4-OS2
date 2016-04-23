@@ -34,6 +34,7 @@ class Client:
             self.synchroniser()
 
     def communication(self):
+        exeception = False
         r = input("Commande:").split(" ")
         while r[0] != "quitter":
             envoie = None
@@ -57,14 +58,34 @@ class Client:
                     print(self.nom)
                     print(self.dossier)
                     envoie = self.protocole.genere_telechargerFichier(self, self.nom, self.dossier)
+                    self.serveur.send(envoie)
+                    message_serveur = self.serveur.receive()
+                    retourInterprete = self.protocole.interprete(self, message_serveur)
+                    print(retourInterprete)
+                    fd = os.open(os.path.dirname(os.path.abspath(__file__))+self.dossier+"/"+self.nom, os.O_RDWR | os.CREAT)
+                    os.write(fd, retourInterprete["contenu"])
+                    print(os.write(fd, retourInterprete["contenu"]))
+                    os.close(fd)
+                    exeception = True
+                if self.nom in retourInterprete:
+                    self.interface.retourMessageServeur("oui")
                 elif r[0] == "supprimerDossier?":
                     envoie = self.protocole.genere_supprimerDossier(self, r[1])
                 elif r[0] == "supprimerFichier?":
                     self.initialiserInformationDeBase(r[1])
                     envoie = self.protocole.genere_supprimerFichier(self, self.nom, self.dossier)
                 elif r[0] == "fichier?":
-                    #TODO:Trouver la bonne méthode car retourne les fichiers au lieux de répondre Oui, si on écrit ex: d1/f1.txt retourne une erreur
-                    envoie = self.protocole.genere_listeFichiers(self, r[1])
+                    self.initialiserInformationDeBase(r[1])
+                    envoie = self.protocole.genere_listeFichiers(self, self.dossier)
+                    if self.nom != self.dossier:
+                        self.serveur.send(envoie)
+                        message_serveur = self.serveur.receive()
+                        retourInterprete = (self.protocole.interprete(self, message_serveur)).split(" ")
+                        exeception = True
+                        if self.nom in retourInterprete:
+                            self.interface.retourMessageServeur("oui")
+                        else:
+                            self.interface.retourMessageServeur("non")
                 elif r[0] == "identiqueFichier?" or r[0] == "fichierIdentique?":
                     self.initialiserInformationComplexe(r[1])
                     envoie = self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date)
@@ -78,10 +99,12 @@ class Client:
             else:
                 message = "Élément manquant!"
 
-            if envoie != None:
+            if envoie != None and exeception == False:
                 self.serveur.send(envoie)
                 message_serveur = self.serveur.receive()
                 self.interface.retourMessageServeur(self.protocole.interprete(self, message_serveur))
+            elif exeception:
+                pass
             else:
                 self.interface.retourMessageServeur(message)
 
