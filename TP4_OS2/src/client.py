@@ -34,7 +34,6 @@ class Client:
             self.synchroniser()
 
     def communication(self):
-        exeception = False
         r = input("Commande:").split(" ")
         while r[0] != "quitter":
             envoie = None
@@ -44,6 +43,9 @@ class Client:
             elif r[0] == "nomServeur?":
                 envoie = self.protocole.genere_nom(self)
             elif r[0] == "listeDossier?":
+                if len(r) != 1:
+                    envoie = self.protocole.genere_listeDossiers(self, r[1])
+                else:
                     envoie = self.protocole.genere_listeDossiers(self, "./")
             elif len(r)!= 1:
                 if r[0] == "dossier?":
@@ -66,9 +68,8 @@ class Client:
                     os.write(fd, retourInterprete["contenu"])
                     print(os.write(fd, retourInterprete["contenu"]))
                     os.close(fd)
-                    exeception = True
-                if self.nom in retourInterprete:
-                    self.interface.retourMessageServeur("oui")
+                    if self.nom in retourInterprete:
+                        self.interface.retourMessageServeur("oui")
                 elif r[0] == "supprimerDossier?":
                     envoie = self.protocole.genere_supprimerDossier(self, r[1])
                 elif r[0] == "supprimerFichier?":
@@ -81,13 +82,13 @@ class Client:
                         self.serveur.send(envoie)
                         message_serveur = self.serveur.receive()
                         retourInterprete = (self.protocole.interprete(self, message_serveur)).split(" ")
-                        exeception = True
                         if self.nom in retourInterprete:
                             self.interface.retourMessageServeur("oui")
                         else:
                             self.interface.retourMessageServeur("non")
                 elif r[0] == "identiqueFichier?" or r[0] == "fichierIdentique?":
                     self.initialiserInformationComplexe(r[1])
+                    print(self.nom, self.dossier, self.signature, self.date)
                     envoie = self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date)
                 elif r[0] == "fichierRecent?":
                     self.initialiserInformationComplexe(r[1])
@@ -99,11 +100,11 @@ class Client:
             else:
                 message = "Élément manquant!"
 
-            if envoie != None and exeception == False:
+            if envoie != None and (r[0] != "telecharger?" or r[0] != "fichier?"):
                 self.serveur.send(envoie)
                 message_serveur = self.serveur.receive()
                 self.interface.retourMessageServeur(self.protocole.interprete(self, message_serveur))
-            elif exeception:
+            elif r[0] == "telecharger?" or r[0] == "fichier?":
                 pass
             else:
                 self.interface.retourMessageServeur(message)
@@ -111,10 +112,31 @@ class Client:
             r = input("Commande:").split(" ")
 
     def synchroniser(self):
-        self.interface.retourMessageServeur("Méthode Sync non fonctionnel")
+        self.miseAjour("./")
 
     def miseAjour(self, dossier):
+        """self.serveur.send(self.protocole.genere_listeFichiers(dossier))
+        listFichiers = self.protocole.interprete(self.serveur.receive()).split(" ")
+        for fichier in listFichiers:
+            fichierLocal = os.path.dirname(os.path.abspath(__file__)) + "\ ".strip() + dossier + "\ ".strip() + fichier
+            self.initialiserInformationComplexe(fichierLocal)
+            self.serveur.send(self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date))
+            if self.interface.retourMessageServeur(self.protocole.interprete(self, self.serveur.receive())) != "oui":
+                if self.serveur.send(self.protocole.genere_fichierRecent(self, self.nom, self.dossier, self.signature, self.date)) == "oui":"""
+
         pass
+        """self.serveur.send(self.protocole.genere_listeDossiers(dossier))
+        nbDossier = self.protocole.interprete(self.serveur.receive()).split(" ")
+        self.serveur.send(self.protocole.genere_listeFichiers(dossier))
+
+        for i in range(0, len(nbDossier)):
+            for j in range(0, len(nbFichier)):
+
+    def obtenirNbDossier(self, dossier):
+        listeDossier = list
+        listeDossier.add(dossier)
+        while listeDossier != None:"""
+
 
     def initialiserInformationDeBase(self, ligne):
         self.nom = self.obtenirNomFichier(ligne)
@@ -165,7 +187,6 @@ class Client:
 
     def obtenirContenu(self, fichier):
         try:
-            # Voici comment lire le contenu d'un fichier
             contenu = open(fichier).read()
         except:
             print("Impossible de lire le fichier " + fichier)

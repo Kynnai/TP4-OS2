@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 #import
-import sl4a
+#import sl4a
 import time
 
 
 class InterfaceUtilisateur:
 
-    droid = sl4a.Android()
+    #droid = sl4a.Android()
 
     def __init__(self):
         pass
