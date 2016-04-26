@@ -52,12 +52,17 @@ class ProtocoleXml(Protocole):
             fichiers = self.obtenirElements(interpreteur["listeFichiers"]["fichier"])
             return fichiers
         elif ("fichier" in interpreteur):
-            return self.obtenirElements(interpreteur["fichier"])
+            test = self.obtenirElements(interpreteur["fichier"])
+            print(test)
+            return test
 
     def obtenirElements(self, monDict):
         retourStr = ""
-        for i in range(0, len(monDict)):
-            retourStr += monDict[i] + " "
+        print(monDict)
+        #for i in range(0, len(monDict)):
+        for element in monDict:
+            retourStr += element + " "
+            print(retourStr)
 
         return retourStr
 
@@ -93,7 +98,7 @@ class ProtocoleXml(Protocole):
         return self.PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<date>" + date + "</date>" + "</questionFichierRecent>"
 
     def genere_fichierIdentique(self, nom, dossier, signature,  date):
-        return self.PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<signature>" + signature + "</signature>" "<date>" + date + "</date>" + "</questionFichierRecent>"
+        return self.PREFIXE_XML + "<questionFichierIdentique>" + "<nom>" + nom + "</nom>" + "<dossier>" + dossier + "</dossier>" + "<signature>" + signature + "</signature>" "<date>" + date + "</date>" + "</questionFichierIdentique>"
 
     def genere_quitter(self):
         return self.PREFIXE_XML + "<quitter />"

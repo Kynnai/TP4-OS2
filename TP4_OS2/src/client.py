@@ -9,6 +9,8 @@ import sys
 import hashlib
 import os
 import binascii
+import xmltodict
+import json
 
 
 class Client:
@@ -56,20 +58,8 @@ class Client:
                     self.initialiserInformationComplexe(r[1])
                     envoie = self.protocole.genere_televerserFichier(self, self.nom, self.dossier, self.signature, self.contenu, self.date)
                 elif r[0] == "telecharger?":
-                    self.initialiserInformationDeBase(r[1])
-                    print(self.nom)
-                    print(self.dossier)
-                    envoie = self.protocole.genere_telechargerFichier(self, self.nom, self.dossier)
-                    self.serveur.send(envoie)
-                    message_serveur = self.serveur.receive()
-                    retourInterprete = self.protocole.interprete(self, message_serveur)
-                    print(retourInterprete)
-                    fd = os.open(os.path.dirname(os.path.abspath(__file__))+self.dossier+"/"+self.nom, os.O_RDWR | os.CREAT)
-                    os.write(fd, retourInterprete["contenu"])
-                    print(os.write(fd, retourInterprete["contenu"]))
-                    os.close(fd)
-                    if self.nom in retourInterprete:
-                        self.interface.retourMessageServeur("oui")
+                    self.telecharger(r[1])
+                    self.interface.retourMessageServeur("OK")
                 elif r[0] == "supprimerDossier?":
                     envoie = self.protocole.genere_supprimerDossier(self, r[1])
                 elif r[0] == "supprimerFichier?":
@@ -86,9 +76,8 @@ class Client:
                             self.interface.retourMessageServeur("oui")
                         else:
                             self.interface.retourMessageServeur("non")
-                elif r[0] == "identiqueFichier?" or r[0] == "fichierIdentique?":
+                elif r[0] == "identiqueFichier?" or r[0] == "fichierIdentique?" or r[0] == "telecharger?":
                     self.initialiserInformationComplexe(r[1])
-                    print(self.nom, self.dossier, self.signature, self.date)
                     envoie = self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date)
                 elif r[0] == "fichierRecent?":
                     self.initialiserInformationComplexe(r[1])
@@ -100,43 +89,74 @@ class Client:
             else:
                 message = "Élément manquant!"
 
-            if envoie != None and (r[0] != "telecharger?" or r[0] != "fichier?"):
+            if envoie != None and r[0] != "telecharger?" and r[0] != "miseAjour":
                 self.serveur.send(envoie)
                 message_serveur = self.serveur.receive()
                 self.interface.retourMessageServeur(self.protocole.interprete(self, message_serveur))
-            elif r[0] == "telecharger?" or r[0] == "fichier?":
+            elif r[0] == "telecharger?" or r[0] == "fichier?" or r[0] == "miseAjour":
                 pass
             else:
                 self.interface.retourMessageServeur(message)
 
             r = input("Commande:").split(" ")
+        self.interface.retourMessageServeur("bye")
 
     def synchroniser(self):
         self.miseAjour("./")
 
     def miseAjour(self, dossier):
-        """self.serveur.send(self.protocole.genere_listeFichiers(dossier))
-        listFichiers = self.protocole.interprete(self.serveur.receive()).split(" ")
-        for fichier in listFichiers:
-            fichierLocal = os.path.dirname(os.path.abspath(__file__)) + "\ ".strip() + dossier + "\ ".strip() + fichier
+        envoie = self.protocole.genere_listeFichiers(self, dossier)
+        self.serveur.send(envoie)
+        message_serveur = self.serveur.receive()
+        monDict = None
+        if message_serveur[0:22] == '<?xml version="1.0" ?>':
+            monDict = xmltodict.parse(message_serveur[22:len(message_serveur)])
+        else:
+            monDict = json.loads(message_serveur)
+        for fichier in monDict['listeFichiers']['fichier']:
+            fichierLocal = dossier + "/" + fichier
             self.initialiserInformationComplexe(fichierLocal)
             self.serveur.send(self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date))
-            if self.interface.retourMessageServeur(self.protocole.interprete(self, self.serveur.receive())) != "oui":
-                if self.serveur.send(self.protocole.genere_fichierRecent(self, self.nom, self.dossier, self.signature, self.date)) == "oui":"""
+            message_serveur = self.serveur.receive()
+            if message_serveur[0:22] == '<?xml version="1.0" ?>':
+                reponse = message_serveur[22:len(message_serveur)]
+            else:
+                reponse = json.loads(message_serveur)['reponse']
+            if reponse == "non" or reponse == "<non/>":
+                self.serveur.send(self.protocole.genere_fichierRecent(self, self.nom, self.dossier, self.date))
+                message_serveur = self.serveur.receive()
+                if message_serveur[0:22] == '<?xml version="1.0" ?>':
+                    reponse = message_serveur[22:len(message_serveur)]
+                else:
+                    reponse = json.loads(message_serveur)['reponse']
 
-        pass
-        """self.serveur.send(self.protocole.genere_listeDossiers(dossier))
-        nbDossier = self.protocole.interprete(self.serveur.receive()).split(" ")
-        self.serveur.send(self.protocole.genere_listeFichiers(dossier))
+                print(reponse)
+                if reponse == "oui" or reponse == "<oui/>":
+                    self.serveur.send(self.protocole.genere_supprimerFichier(self, self.nom, self.dossier))
+                    self.serveur.receive()
+                    self.serveur.send(self.protocole.genere_televerserFichier(self, self.nom, self.dossier, self.signature, self.contenu, self.date))
+                    self.serveur.receive()
+                else:
+                    self.telecharger(dossier+"/"+fichier)
+                    self.interface.retourMessageServeur(fichier + " MAJ")
+        self.interface.retourMessageServeur("Mise à jour réussis")
 
-        for i in range(0, len(nbDossier)):
-            for j in range(0, len(nbFichier)):
-
-    def obtenirNbDossier(self, dossier):
-        listeDossier = list
-        listeDossier.add(dossier)
-        while listeDossier != None:"""
-
+    def telecharger(self, chemin):
+        self.initialiserInformationDeBase(chemin)
+        envoie = self.protocole.genere_telechargerFichier(self, self.nom, self.dossier)
+        self.serveur.send(envoie)
+        message_serveur = self.serveur.receive()
+        print(message_serveur)
+        monDict = None
+        if message_serveur[0:22] == '<?xml version="1.0" ?>':
+            monDict = xmltodict.parse(message_serveur[22:len(message_serveur)])
+        else:
+            monDict = json.loads(message_serveur)
+        fd = open(os.path.dirname(os.path.abspath(__file__)) + "/" + self.dossier + "/" + self.nom, 'wb')
+        if monDict['fichier']['contenu'] != None:
+            fd.write(binascii.a2b_base64(monDict['fichier']['contenu'].encode(encoding='UTF-8')))
+        os.utime(os.path.dirname(os.path.abspath(__file__)) + "/" + self.dossier + "/" + self.nom, (0, int(float(monDict['fichier']['date']))))
+        fd.close()
 
     def initialiserInformationDeBase(self, ligne):
         self.nom = self.obtenirNomFichier(ligne)
