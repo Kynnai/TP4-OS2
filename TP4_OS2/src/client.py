@@ -25,15 +25,18 @@ class Client:
     signature = None
     contenu = None
     date = None
+    path = None
+    rep = "DropBox"
 
     def __init__(self, protocole, port, prompt):
+        self.path = os.path.dirname(os.path.abspath(__file__))
         self.protocole = protocole
         self.serveur = Serveur(port)
         self.interface = InterfaceUtilisateur()
         if prompt:
             self.communication()
         else:
-            self.synchroniser()
+            self.synchroniser(self.rep, "./")
 
     def communication(self):
         r = input("Commande:").split(" ")
@@ -51,7 +54,7 @@ class Client:
                     envoie = self.protocole.genere_listeDossiers(self, "./")
             elif len(r)!= 1:
                 if r[0] == "dossier?":
-                    envoie = self.protocole.genere_listeDossiers(self, r[1])
+                    self.interface.retourMessageServeur(self.dossierExist(r[1]))
                 elif r[0] == "creerDossier?":
                     envoie = self.protocole.genere_creerDossier(self, r[1])
                 elif r[0]  == "televerser?":
@@ -89,11 +92,11 @@ class Client:
             else:
                 message = "Élément manquant!"
 
-            if envoie != None and r[0] != "telecharger?" and r[0] != "miseAjour":
+            if envoie != None and r[0] != "telecharger?" and r[0] != "miseAjour" and r[0] != "dossier?":
                 self.serveur.send(envoie)
                 message_serveur = self.serveur.receive()
                 self.interface.retourMessageServeur(self.protocole.interprete(self, message_serveur))
-            elif r[0] == "telecharger?" or r[0] == "fichier?" or r[0] == "miseAjour":
+            elif r[0] == "telecharger?" or r[0] == "fichier?" or r[0] == "miseAjour" or r[0] == "dossier?":
                 pass
             else:
                 self.interface.retourMessageServeur(message)
@@ -101,10 +104,45 @@ class Client:
             r = input("Commande:").split(" ")
         self.interface.retourMessageServeur("bye")
 
-    def synchroniser(self):
-        self.miseAjour("./")
+    def dossierExist(self, dossier):
+        envoie = self.protocole.genere_listeDossiers(self, dossier)
+        self.serveur.send(envoie)
+        message_serveur = self.serveur.receive()
+        if "listeDossier" in message_serveur:
+            return "oui"
+        else:
+            return "non"
+    def synchroniser(self, pathLocal, pathServeur):
+        if self.dossierExist(pathLocal) == "non":
+            self.serveur.send(self.protocole.genere_creerDossier(self,pathLocal))
+            self.serveur.receive()
+            self.miseAjour(pathLocal)
+
+        self.serveur.send(self.protocole.genere_listeDossiers(self,pathServeur))
+        message_serveur = self.serveur.receive()
+        listDossierServeur = None
+        if message_serveur[0:22] == '<?xml version="1.0" ?>':
+            listDossierServeur = xmltodict.parse(message_serveur[22:len(message_serveur)])
+        else:
+            listDossierServeur = json.loads(message_serveur)
+
+        for dossier in listDossierServeur['listeDossiers']['dossier']:
+            if not os.path.isdir(dossier):
+                os.mkdir(pathLocal+dossier)
+                self.miseAjour(dossier)
+                self.synchroniser(pathLocal +"/"+ dossier, pathServeur+"/"+ dossier)
+
+        listDossierLocal = next(os.walk(pathLocal))[1]
+        for dossierLocal in listDossierLocal:
+            if pathServeur != "./":
+                self.miseAjour(pathLocal + "/" + dossierLocal)
+                self.synchroniser(pathLocal + "/" + dossierLocal, pathServeur + "/" + dossierLocal)
+            else:
+                self.miseAjour(pathLocal +"/"+ dossierLocal)
+                self.synchroniser(pathLocal +"/"+ dossierLocal, pathLocal +"/" + dossierLocal)
 
     def miseAjour(self, dossier):
+        listeFichierLocal = os.listdir(dossier)
         envoie = self.protocole.genere_listeFichiers(self, dossier)
         self.serveur.send(envoie)
         message_serveur = self.serveur.receive()
@@ -114,8 +152,10 @@ class Client:
         else:
             monDict = json.loads(message_serveur)
         for fichier in monDict['listeFichiers']['fichier']:
-            fichierLocal = dossier + "/" + fichier
-            self.initialiserInformationComplexe(fichierLocal)
+            if not fichier in listeFichierLocal:
+                self.telecharger(dossier + "/" + fichier)
+            #fichierLocal = (os.path.dirname(os.path.abspath(__doc__)) + "/" + self.dossier)
+            self.initialiserInformationComplexe(dossier + "/" + fichier)
             self.serveur.send(self.protocole.genere_fichierIdentique(self, self.nom, self.dossier, self.signature, self.date))
             message_serveur = self.serveur.receive()
             if message_serveur[0:22] == '<?xml version="1.0" ?>':
@@ -130,7 +170,6 @@ class Client:
                 else:
                     reponse = json.loads(message_serveur)['reponse']
 
-                print(reponse)
                 if reponse == "oui" or reponse == "<oui/>":
                     self.serveur.send(self.protocole.genere_supprimerFichier(self, self.nom, self.dossier))
                     self.serveur.receive()
@@ -139,6 +178,22 @@ class Client:
                 else:
                     self.telecharger(dossier+"/"+fichier)
                     self.interface.retourMessageServeur(fichier + " MAJ")
+
+        for element in listeFichierLocal:
+            if not os.path.isdir(element):
+                self.initialiserInformationComplexe(dossier +"/"+ element)
+                self.serveur.send(self.protocole.genere_fichierRecent(self, self.nom, self.dossier, self.date))
+                message_serveur = self.serveur.receive()
+                if message_serveur[0:22] == '<?xml version="1.0" ?>':
+                    reponse = message_serveur[22:len(message_serveur)]
+                else:
+                    reponse = json.loads(message_serveur)['reponse']
+
+                if reponse == "oui" or reponse == "<oui/>":
+                    self.serveur.send(self.protocole.genere_supprimerFichier(self, self.nom, self.dossier))
+                    self.serveur.receive()
+                    self.serveur.send(self.protocole.genere_televerserFichier(self, self.nom, self.dossier, self.signature, self.contenu, self.date))
+                    self.serveur.receive()
         self.interface.retourMessageServeur("Mise à jour réussis")
 
     def telecharger(self, chemin):
@@ -146,16 +201,15 @@ class Client:
         envoie = self.protocole.genere_telechargerFichier(self, self.nom, self.dossier)
         self.serveur.send(envoie)
         message_serveur = self.serveur.receive()
-        print(message_serveur)
         monDict = None
         if message_serveur[0:22] == '<?xml version="1.0" ?>':
             monDict = xmltodict.parse(message_serveur[22:len(message_serveur)])
         else:
             monDict = json.loads(message_serveur)
-        fd = open(os.path.dirname(os.path.abspath(__file__)) + "/" + self.dossier + "/" + self.nom, 'wb')
+        fd = open(self.path +"/" + self.dossier + "/" + self.nom, 'wb')
         if monDict['fichier']['contenu'] != None:
             fd.write(binascii.a2b_base64(monDict['fichier']['contenu'].encode(encoding='UTF-8')))
-        os.utime(os.path.dirname(os.path.abspath(__file__)) + "/" + self.dossier + "/" + self.nom, (0, int(float(monDict['fichier']['date']))))
+        os.utime(self.path + "/" + self.dossier + "/" + self.nom, (0, int(float(monDict['fichier']['date']))))
         fd.close()
 
     def initialiserInformationDeBase(self, ligne):
@@ -163,7 +217,7 @@ class Client:
         self.dossier = self.obtenirDossier(ligne)
 
     def initialiserInformationComplexe(self, ligne):
-        chemin = os.path.dirname(os.path.abspath(__file__)) + "\ ".strip() + ligne
+        chemin = self.path + "\ ".strip() + ligne
         self.nom = self.obtenirNomFichier(ligne)
         self.dossier = self.obtenirDossier(ligne)
         self.signature = self.obtenirSignature(chemin)
@@ -176,9 +230,12 @@ class Client:
         return fichier
 
     def obtenirDossier(self, ligne):
-        dossier = ligne.split("/")
-        dernier = dossier[len(dossier) - 2]
-        return dernier
+        dossiers = ligne.split("/")
+        retour = ""
+        for dossier in dossiers:
+            if dossier != dossiers[len(dossiers) - 1]:
+                retour = retour + dossier +"/"
+        return retour
 
     def obtenirElements(self, monDict):
         return self.protocole.obtenirElements(self, monDict)
@@ -218,6 +275,8 @@ class Client:
         return contenu_ascii
 
 if __name__ == '__main__':
+    if not os.path.isdir("DropBox"):
+        os.mkdir("DropBox")
     prompt = False
     if  "prompt" in sys.argv:
         prompt = True

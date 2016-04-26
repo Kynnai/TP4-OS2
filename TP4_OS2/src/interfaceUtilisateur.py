@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #import
-import sl4a
+#import sl4a
 import time
 import os
 
@@ -12,7 +12,8 @@ class InterfaceUtilisateur:
     droid = None
 
     def __init__(self):
-        self.droid = sl4a.Android()
+        #self.droid = sl4a.Android()
+        pass
 
     def retourMessageServeur(self, texte):
         print("Réponse serveur : " + texte)
