@@ -14,7 +14,7 @@ class Serveur:
 		pass
 
 	def receive(self):
-		return "Bonjour maitre!"
+		return "ok"
 
 	def close(self):
 		pass

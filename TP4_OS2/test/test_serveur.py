@@ -8,7 +8,4 @@ from TP4_OS2.mock.serveur import Serveur
 
 
 class TestServeur(TestCase):
-    def test_send(self):
-        Serveur.send(self, 'Bonjour')
-        expectMsg = "Bonjour maitre!"
-        assert Client.receive(self, expectMsg) == expectMsg
+    pass

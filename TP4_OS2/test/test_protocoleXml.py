@@ -51,11 +51,11 @@ class TestProtocole_xml(TestCase):
         self.assertTrue(self.protocole.genere_supprimerDossier(self.dossier), self.PREFIXE_XML + "<supprimerDossier>" + self.dossier + "</supprimerDossier>")
 
     def test_questionFichierRecent_XML(self):
-        self.assertTrue(self.protocole.genere_questionFichierRecent(self.nom, self.dossier, self.date),
+        self.assertTrue(self.protocole.genere_fichierRecent(self.nom, self.dossier, self.date),
                         self.PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + self.nom + "</nom>" + "<dossier>" + self.dossier + "</dossier>" + "<date>" + self.date + "</date>" + "</questionFichierRecent>")
 
     def test__questionFichierIdentique(self):
-        self.assertTrue(self.protocole.genere_questionFichierIdentique(self.nom, self.dossier, self.signature, self.date),
+        self.assertTrue(self.protocole.genere_fichierIdentique(self.nom, self.dossier, self.signature, self.date),
                         self.PREFIXE_XML + "<questionFichierRecent>" + "<nom>" + self.nom + "</nom>" + "<dossier>" + self.dossier + "</dossier>" + "<signature>" + self.signature + "</signature>" "<date>" + self.date + "</date>" + "</questionFichierRecent>")
 
     def test_quitter_XML(self):

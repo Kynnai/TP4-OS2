@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 import json
 #pour les tests
-#from TP4_OS2.src.protocole import Protocole
+from TP4_OS2.src.protocole import Protocole
 
 #pour le serveur
-from protocole import Protocole
+#from protocole import Protocole
 
 
 class ProtocoleJson(Protocole):

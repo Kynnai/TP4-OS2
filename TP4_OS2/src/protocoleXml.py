@@ -3,7 +3,8 @@
 
 #TODO:lien pour installer la libraries https://github.com/martinblech/xmltodict
 import xmltodict
-from protocole import Protocole
+#from protocole import Protocole
+from TP4_OS2.src.protocole import Protocole
 
 
 class ProtocoleXml(Protocole):
@@ -11,8 +12,8 @@ class ProtocoleXml(Protocole):
 
     PREFIXE_XML = "<?xml version=\"1.0\" ?>"
     client = None
-    def __init__(self, client):
-        self.client = client
+    def __init__(self):
+        pass
 
     def interprete(self, message_serveur):
         interpreteur = xmltodict.parse(message_serveur[22:len(message_serveur)])

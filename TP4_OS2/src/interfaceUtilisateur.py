@@ -18,6 +18,9 @@ class InterfaceUtilisateur:
     def retourMessageServeur(self, texte):
         print("Réponse serveur : " + texte)
 
+    def lecteur(self):
+        return input("Commande:").split(" ")
+
     #TODO: Puisqu'on peut exécuter plusieurs fois le script -> pour garder l'arbo précédente
     def demandeSuppArboDropbox(self):
         title = 'Attention'

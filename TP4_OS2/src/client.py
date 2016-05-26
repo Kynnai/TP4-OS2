@@ -1,10 +1,17 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+from TP4_OS2.mock.serveur import Serveur
+from TP4_OS2.src.protocoleJson import ProtocoleJson
+from TP4_OS2.src.protocoleXml import ProtocoleXml
+#from TP4_OS2.src.interfaceUtilisateur import InterfaceUtilisateur
+from TP4_OS2.mock.interfaceUtilisateur import InterfaceUtilisateur
+
+"""
 from serveur import Serveur
 from protocoleJson import ProtocoleJson
 from protocoleXml import ProtocoleXml
-from interfaceUtilisateur import InterfaceUtilisateur
+from interfaceUtilisateur import InterfaceUtilisateur"""
 import sys
 import hashlib
 import os
@@ -39,7 +46,7 @@ class Client:
             self.synchroniser(self.rep, "./")
 
     def communication(self):
-        r = input("Commande:").split(" ")
+        r = self.interface.lecteur()
         while r[0] != "quitter":
             envoie = None
             message = "Commande invalide"
